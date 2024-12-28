@@ -1,6 +1,6 @@
 use console::Term;
 use rand::distributions::{Alphanumeric, DistString};
-use std::time::{Duration, SystemTime};
+use std::{thread, time::{Duration, SystemTime}};
 
 struct Game {
     score: i32,
@@ -22,6 +22,31 @@ impl Game {
             self.term.clear_last_lines(1).unwrap();
         }
         println!("------------------ Score: {} ------------------", self.score);
+    }
+
+    fn intro_screen(&self) {
+        println!("Welcome to my typing game");
+        println!("When you are ready in front of your keyboard, press enter!");
+        loop {
+            if let Some(key) = self.read_character() {
+                if key == '\n' {
+                    self.term.clear_last_lines(1).unwrap();
+                    self.term.clear_last_lines(1).unwrap();
+                    return;
+                }
+            }
+        }
+        
+    }
+
+    fn countdown(mut self, time_in_seconds: usize) -> Self {
+        for i in (1..=time_in_seconds).rev() {
+            println!("{}", i);
+            thread::sleep(Duration::from_secs(1));
+            self.term.clear_last_lines(1).unwrap();
+        }
+        self.start_time = SystemTime::now();
+        return self
     }
 
     fn read_character(&self) -> Option<char> {
@@ -74,6 +99,9 @@ const GAME_DURATION: usize = 10;
 
 fn main() {
     let mut game = Game::new();
+
+    game.intro_screen();
+    game = game.countdown(3);
 
     game.refresh_score_bar(true);
 
