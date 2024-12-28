@@ -28,15 +28,14 @@ impl Game {
         println!("Welcome to my typing game");
         println!("When you are ready in front of your keyboard, press enter!");
         loop {
-            if let Some(key) = self.read_character() {
+            if let Some(key) = self.read_character(false) {
                 if key == '\n' {
                     self.term.clear_last_lines(1).unwrap();
                     self.term.clear_last_lines(1).unwrap();
                     return;
                 }
             }
-        }
-        
+        }   
     }
 
     fn countdown(mut self, time_in_seconds: usize) -> Self {
@@ -49,10 +48,12 @@ impl Game {
         return self
     }
 
-    fn read_character(&self) -> Option<char> {
+    fn read_character(&self, remove_line: bool) -> Option<char> {
         match self.term.read_char() {
             Ok(c) => {
-                self.term.clear_last_lines(1).unwrap();
+                if remove_line{
+                    self.term.clear_last_lines(1).unwrap();
+                }
                 Some(c)
             }
             Err(_) => None,
@@ -71,7 +72,7 @@ impl Game {
         let random_char = Self::generate_random_character();
         println!("Press {}", random_char);
 
-        if let Some(answer) = self.read_character() {
+        if let Some(answer) = self.read_character(true) {
             if random_char.to_ascii_lowercase() == answer.to_ascii_lowercase() {
                 self.score += 1;
                 self.refresh_score_bar(false);
